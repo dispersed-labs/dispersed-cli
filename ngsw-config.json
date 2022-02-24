@@ -1,0 +1,15 @@
+{
+    "index": "/index.html",
+    "assetGroups": [
+        {
+            "name": "main",
+            "installMode": "lazy",
+            "resources": {
+                "files": [
+                    "**",
+                    "!/ngsw.json"
+                ]
+            }
+        }
+    ]
+}

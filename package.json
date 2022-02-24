@@ -1,0 +1,15 @@
+{
+  "name": "dispersed-network",
+  "version": "0.1.0",
+  "description": "Utilities for using the Dispersed Network",
+  "main": "cli.js",
+  "bin": {
+    "dispersed-network": "./cli.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@angular/service-worker": "^13.2.4",
+    "yargs": "^17.3.1"
+  }
+}
