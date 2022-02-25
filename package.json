@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "@angular/service-worker": "^13.2.4",
+    "tar": "^6.1.11",
     "yargs": "^17.3.1"
   }
 }
