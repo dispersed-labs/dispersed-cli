@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-const { exec } = require('child_process');
+const { execSync } = require('child_process');
+const fs = require('fs');
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 
@@ -22,11 +23,7 @@ yargs(hideBin(process.argv))
 function generateManifest(argv) {
     const buildDir = argv['build-dir'];
     const rootDir = './node_modules/dispersed-cli';
-    exec(`${rootDir}/node_modules/.bin/ngsw-config ${buildDir} ${rootDir}/ngsw-config.json`, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`exec error: ${error}`);
-            return;
-        }
-        console.log(`Successfully wrote ${buildDir}/ngsw.json`);
-    });
+    execSync(`${rootDir}/node_modules/.bin/ngsw-config ${buildDir} ${rootDir}/ngsw-config.json`);
+    fs.renameSync(`${buildDir}/ngsw.json`, `${buildDir}/dispersed.json`);
+    console.log(`Successfully wrote ${buildDir}/dispersed.json`);
 }
