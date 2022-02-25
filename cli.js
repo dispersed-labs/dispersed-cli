@@ -80,8 +80,8 @@ function checksum(file) {
 }
 
 function generateManifest(buildDir) {
-    const rootDir = './node_modules/dispersed-cli';
-    execSync(`${rootDir}/node_modules/.bin/ngsw-config ${buildDir} ${rootDir}/ngsw-config.json`);
+    const pkgDir = './node_modules/dispersed-cli';
+    execSync(`npx ngsw-config ${buildDir} ${pkgDir}/ngsw-config.json`);
     fs.renameSync(`${buildDir}/ngsw.json`, `${buildDir}/dispersed.json`);
     console.log(`Successfully created manifest: ${buildDir}/dispersed.json`);
 }
