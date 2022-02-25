@@ -7,7 +7,7 @@
     "dispersed": "./cli.js"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@angular/service-worker": "^13.2.4",
     "yargs": "^17.3.1"
