@@ -1,10 +1,10 @@
 {
-  "name": "dispersed-network",
+  "name": "dispersed-cli",
   "version": "0.1.0",
-  "description": "Utilities for using the Dispersed Network",
+  "description": "Command line utility for the Dispersed Network",
   "main": "cli.js",
   "bin": {
-    "dispersed-network": "./cli.js"
+    "dispersed": "./cli.js"
   },
   "author": "",
   "license": "ISC",

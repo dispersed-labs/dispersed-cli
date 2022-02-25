@@ -21,7 +21,7 @@ yargs(hideBin(process.argv))
 
 function generateManifest(argv) {
     const buildDir = argv['build-dir'];
-    const rootDir = './node_modules/dispersed-network';
+    const rootDir = './node_modules/dispersed-cli';
     exec(`${rootDir}/node_modules/.bin/ngsw-config ${buildDir} ${rootDir}/ngsw-config.json`, (error, stdout, stderr) => {
         if (error) {
             console.error(`exec error: ${error}`);
