@@ -10,10 +10,14 @@ npm install dispersed-cli
 
 ## Usage
 
-### Generating a Manifest
+### Creating a Bundle
 
-Once a site has been built and is ready for bundling, run the following command to generate the Dispersed Network manifest:
+Once a site has been built and is ready for bundling, run the following command to generate a Dispersed Network compatible tarball:
+
 ```sh
-npx dispersed generate-manifest <build-dir>
+npx dispersed bundle <archive> <build-dir>
 ```
-The manifest will automatically be saved as `<build-dir>/dispersed.json`.
+
+Example: `npx dispersed bundle mysite.tgz ./dist`
+
+Note that running `bundle` will also print the SHA256 checksum of the archive, which is needed for publishing the site to the Dispersed Network.
