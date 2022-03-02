@@ -61,8 +61,15 @@ function bundle(archive, buildDir) {
             gzip: true,
             file: archive,
             sync: true,
+
+            // Always change directories to the immediate parent of buildDir before
+            // archiving so that the final file structure is one level deep.
+            C: path.join(buildDir, '..'),
         },
-        [buildDir]
+        [
+            // Due to the `C` flag used above, only specify the final path component.
+            path.basename(buildDir)
+        ]
     );
     console.log(`Successfully created archive: ${archive}`);
     checksum(archive);
