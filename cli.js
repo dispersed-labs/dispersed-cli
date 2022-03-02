@@ -3,6 +3,7 @@
 const { execSync } = require('child_process');
 const crypto = require('crypto');
 const fs = require('fs');
+const path = require('path');
 const tar = require('tar');
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
@@ -60,8 +61,15 @@ function bundle(archive, buildDir) {
             gzip: true,
             file: archive,
             sync: true,
+
+            // Always change directories to the immediate parent of buildDir before
+            // archiving so that the final file structure is one level deep.
+            C: path.join(buildDir, '..'),
         },
-        [buildDir]
+        [
+            // Due to the `C` flag used above, only specify the final path component.
+            path.basename(buildDir)
+        ]
     );
     console.log(`Successfully created archive: ${archive}`);
     checksum(archive);
@@ -80,8 +88,8 @@ function checksum(file) {
 }
 
 function generateManifest(buildDir) {
-    const pkgDir = './node_modules/dispersed-cli';
-    execSync(`npx ngsw-config ${buildDir} ${pkgDir}/ngsw-config.json`);
-    fs.renameSync(`${buildDir}/ngsw.json`, `${buildDir}/dispersed.json`);
-    console.log(`Successfully created manifest: ${buildDir}/dispersed.json`);
+    const pkgDir = path.join('.', 'node_modules', 'dispersed-cli');
+    execSync(`npx ngsw-config ${buildDir} ${path.join(pkgDir, 'ngsw-config.json')}`);
+    fs.renameSync(path.join(buildDir, 'ngsw.json'), path.join(buildDir, 'dispersed.json'));
+    console.log(`Successfully created manifest: ${path.join(buildDir, 'dispersed.json')}`);
 }
