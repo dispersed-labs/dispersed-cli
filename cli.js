@@ -3,6 +3,7 @@
 const { execSync } = require('child_process');
 const crypto = require('crypto');
 const fs = require('fs');
+const path = require('path');
 const tar = require('tar');
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
@@ -80,8 +81,8 @@ function checksum(file) {
 }
 
 function generateManifest(buildDir) {
-    const pkgDir = './node_modules/dispersed-cli';
-    execSync(`npx ngsw-config ${buildDir} ${pkgDir}/ngsw-config.json`);
-    fs.renameSync(`${buildDir}/ngsw.json`, `${buildDir}/dispersed.json`);
-    console.log(`Successfully created manifest: ${buildDir}/dispersed.json`);
+    const pkgDir = path.join('.', 'node_modules', 'dispersed-cli');
+    execSync(`npx ngsw-config ${buildDir} ${path.join(pkgDir, 'ngsw-config.json')}`);
+    fs.renameSync(path.join(buildDir, 'ngsw.json'), path.join(buildDir, 'dispersed.json'));
+    console.log(`Successfully created manifest: ${path.join(buildDir, 'dispersed.json')}`);
 }
