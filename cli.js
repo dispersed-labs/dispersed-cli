@@ -65,6 +65,9 @@ function bundle(archive, buildDir) {
             // Always change directories to the immediate parent of buildDir before
             // archiving so that the final file structure is one level deep.
             C: path.join(buildDir, '..'),
+
+            // Follow symlinks, the network will only serve regular files.
+            follow: true,
         },
         [
             // Due to the `C` flag used above, only specify the final path component.
