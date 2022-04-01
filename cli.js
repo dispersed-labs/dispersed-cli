@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
-const { execSync } = require('child_process');
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
 const crypto = require('crypto');
 const fs = require('fs');
+const fsPromises = require('fs/promises');
 const path = require('path');
 const tar = require('tar');
 const yargs = require('yargs/yargs');
@@ -21,8 +23,15 @@ yargs(hideBin(process.argv))
                     describe: 'Relative path to the build directory (e.g. ./dist)',
                 })
         },
-        (argv) => {
-            bundle(argv.archive, argv.buildDir);
+        async (argv) => {
+            const manifestPath = await generateManifest(argv.buildDir);
+            console.log(`Successfully created manifest: ${manifestPath}`);
+
+            await compress(argv.archive, argv.buildDir);
+            console.log(`Successfully created archive: ${argv.archive}`);
+
+            const sum = await checksum(argv.archive);
+            console.log(`${argv.archive} has SHA256 checksum: ${sum}`);
         }
     )
     .command(
@@ -34,8 +43,8 @@ yargs(hideBin(process.argv))
                     describe: 'The file to checksum',
                 })
         },
-        (argv) => {
-            checksum(argv.file);
+        async (argv) => {
+            console.log(await checksum(argv.file));
         }
     )
     .command(
@@ -47,20 +56,19 @@ yargs(hideBin(process.argv))
                     describe: 'Relative path to the build directory (e.g. ./dist)',
                 })
         },
-        (argv) => {
-            generateManifest(argv.buildDir);
+        async (argv) => {
+            const manifestPath = await generateManifest(argv.buildDir);
+            console.log(`Successfully created manifest: ${manifestPath}`);
         }
     )
     .demandCommand(1)
     .parse();
 
-function bundle(archive, buildDir) {
-    generateManifest(buildDir);
-    tar.c(
+async function compress(archive, buildDir) {
+    return tar.c(
         {
             gzip: true,
             file: archive,
-            sync: true,
 
             // Always change directories to the immediate parent of buildDir before
             // archiving so that the final file structure is one level deep.
@@ -74,25 +82,30 @@ function bundle(archive, buildDir) {
             path.basename(buildDir)
         ]
     );
-    console.log(`Successfully created archive: ${archive}`);
-    checksum(archive);
 }
 
-function checksum(file) {
-    var hash = crypto.createHash('sha256');
+async function checksum(file) {
+    const hash = crypto.createHash('sha256');
     hash.setEncoding('hex');
 
-    var fd = fs.createReadStream(file);
-    fd.on('end', function () {
-        hash.end();
-        console.log(`${file} has SHA256 checksum: ${hash.read()}`);
+    return new Promise((resolve, reject) => {
+        const fd = fs.createReadStream(file);
+        fd.on('end', () => {
+            hash.end();
+            resolve(hash.read());
+        });
+        fd.on('error', reject);
+        fd.pipe(hash);
     });
-    fd.pipe(hash);
 }
 
-function generateManifest(buildDir) {
+async function generateManifest(buildDir) {
     const pkgDir = path.join('.', 'node_modules', 'dispersed-cli');
-    execSync(`npx ngsw-config ${buildDir} ${path.join(pkgDir, 'ngsw-config.json')}`);
-    fs.renameSync(path.join(buildDir, 'ngsw.json'), path.join(buildDir, 'dispersed.json'));
-    console.log(`Successfully created manifest: ${path.join(buildDir, 'dispersed.json')}`);
+    const configPath = path.join(pkgDir, 'ngsw-config.json');
+    const outputPath = path.join(buildDir, 'dispersed.json');
+
+    await exec(`npx ngsw-config ${buildDir} ${configPath}`);
+    await fsPromises.rename(path.join(buildDir, 'ngsw.json'), outputPath);
+
+    return outputPath;
 }
